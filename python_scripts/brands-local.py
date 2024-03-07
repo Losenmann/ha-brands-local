@@ -23,6 +23,10 @@ def build_logo(path, url):
 
         subprocess.run(["apk", "add", "rsync", "librsvg-dev", "optipng"])
         subprocess.run(["chmod", "+x", path + "/brands-master/scripts/build.sh"])
+        try:
+            subprocess.run(["ln", "-s", "/tmp/brands-master/build", "/config/www/brands"])
+        except subprocess.CalledProcessError as e:
+            print(e.output)
 
     print(subprocess.run([path + "/brands-master/scripts/build.sh"], shell=True, cwd=path + "/brands-master"))
 
