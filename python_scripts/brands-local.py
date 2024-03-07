@@ -23,12 +23,12 @@ def build_logo(path, url):
 
         subprocess.run(["apk", "add", "rsync", "librsvg-dev", "optipng"])
         subprocess.run(["chmod", "+x", path + "/brands-master/scripts/build.sh"])
+        print(subprocess.run([path + "/brands-master/scripts/build.sh"], shell=True, cwd=path + "/brands-master"))
         try:
-            subprocess.run(["ln", "-s", "/tmp/brands-master/build", "/config/www/brands"])
+            subprocess.run(["mv", "-f", "/tmp/brands-master/build", "/config/www/brands"])
         except subprocess.CalledProcessError as e:
             print(e.output)
-
-    print(subprocess.run([path + "/brands-master/scripts/build.sh"], shell=True, cwd=path + "/brands-master"))
+            exit(1)
 
 def find_js(pattern, path):
     rtn = []
@@ -45,10 +45,10 @@ def edit_js(files):
             lines = sources.readlines()
         with open(i, "w") as sources:
             for line in lines:
-                sources.write(re.sub(r"https://brands.home-assistant.io", "/local/brands/build", line))
+                sources.write(re.sub(r"https://brands.home-assistant.io", "/local/brands", line))
         with open(i, 'rb') as f_in:
             with gzip.open(i + ".gz", "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
 
-edit_js(find_js("*.js", v_path_js))
 build_logo(v_path_logo, v_url_logo)
+edit_js(find_js("*.js", v_path_js))
