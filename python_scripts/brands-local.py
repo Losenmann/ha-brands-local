@@ -8,10 +8,17 @@ import gzip
 import shutil
 import requests
 import zipfile
+import argparse
 
 v_path_logo = "/tmp"
 v_url_logo = "https://codeload.github.com/home-assistant/brands/zip/refs/heads/master"
 v_path_js = "/usr/local/lib/python" + "{0[0]}.{0[1]}".format(sys.version_info) + "/site-packages/hass_frontend"
+
+parser = argparse.ArgumentParser(description="Home Assistant сreating a local copy of brand logos")
+parser.add_argument('-a', '--all', action='store_true', help='Creating a copy of icons and edit frontend files')
+parser.add_argument('-b', '--build', action='store_true', help='Creating a copy of icons')
+parser.add_argument('-f', '--front', action='store_true', help='Edit frontend files')
+args = parser.parse_args()
 
 def build_logo(path, url):
     if not os.path.exists(path + "/brands-master"):
@@ -50,5 +57,7 @@ def edit_js(files):
             with gzip.open(i + ".gz", "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
 
-build_logo(v_path_logo, v_url_logo)
-edit_js(find_js("*.js", v_path_js))
+if args.all or args.build:
+    build_logo(v_path_logo, v_url_logo)
+if args.all or args.front:
+    edit_js(find_js("*.js", v_path_js))
